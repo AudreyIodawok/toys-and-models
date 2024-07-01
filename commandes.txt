@@ -1,0 +1,172 @@
+********************************************************************************************************
+
+# Définir les variables d'environnement sans utiliser dotenv :
+
+# Définissez les variables d'environnement :
+- $env:MYSQL_HOST = '127.0.0.1'
+- $env:MYSQL_PORT = '3306'
+- $env:MYSQL_USER = 'Audreyk'
+- $env:MYSQL_PASSWORD = '***'
+- $env:MYSQL_DATABASE = 'toys_and_model'
+
+Exemple concret :
+
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> $env:MYSQL_HOST = '127.0.0.1'
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> $env:MYSQL_PORT = '3306'
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> $env:MYSQL_USER = 'Audreyk'
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> $env:MYSQL_PASSWORD = 'IodaKauf67!'
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> $env:MYSQL_DATABASE = 'toys_and_model'
+
+Vérification de la configuration :
+
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> echo $env:MYSQL_HOST
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> echo $env:MYSQL_PORT
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> echo $env:MYSQL_USER
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> echo $env:MYSQL_PASSWORD
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> echo $env:MYSQL_DATABASE
+
+# Pour les politiques d'accès (facultatif) :
+
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> Get-ExecutionPolicy
+>>
+RemoteSigned
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Restricted
+ 
+# Créer, accéder et activer l'environnement virtuel :
+
+- python -m venv venv
+- .\venv\Scripts\Activate
+
+# Quitter l'environnement virtuel :
+
+- deactivate
+
+********************************************************************************************************
+
+# Pour utiliser dotenv pour la définition des variables d'environnement :
+# A importer :
+
+- pip install python-dotenv
+en plus des autres librairies nécessaires, à savoir :
+- pip intall sqlalchemy
+- pip install pandas
+- pip install pymysql
+- pip install cryptography
+- OU : pip install pandas sqlalchemy python-dotenv pymysql cryptography
+- Python version 3.10 -> venv venv (ici pour le script)
+
+# NB : librairie "cryptography" (facultative) :
+
+La bibliothèque cryptography joue un rôle crucial dans les méthodes d'authentification sha256_password 
+et caching_sha2_password utilisées par MySQL. Lorsque vous utilisez ces méthodes d'authentification, 
+MySQL nécessite des opérations cryptographiques spécifiques pour sécuriser la communication entre le 
+client et le serveur. La bibliothèque cryptography fournit les fonctionnalités nécessaires pour ces 
+opérations.
+-> Ici, j'ai changé la méthode d'authentification par "mysql_native_password" en lieu et place de
+"caching_sha2_password" (voir plus bas). La librairie "crytpography" n'est donc pas nécessaire. 
+
+# Si problèmes d'installation et d'importation des librairies (supprimer et recréer le fichier venv):
+
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> deactivate
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> Remove-Item -Recurse -Force .\venv
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> python -m venv venv
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> .\venv\Scripts\Activate.ps1
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> python -m pip install --upgrade pip
+- (venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> pip install pandas sqlalchemy python-dotenv
+
+# Pour voir les versions installées dans l'environnement virtuel :
+
+- pip show (python-dotenv / sqlalchemy / ...)
+
+********************************************************************************************************
+
+# Pour visualiser les fichiers du répertoire :
+
+- PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv> dir
+
+********************************************************************************************************
+
+# Créer Fichier .env dans le répertoire pour gérer les informations de connexion :
+
+- MYSQL_HOST=127.0.0.1
+- MYSQL_PORT=3306
+- MYSQL_USER=Audreyk
+- MYSQL_PASSWORD=*** (à remplacer)
+- MYSQL_DATABASE=toys_and_models
+
+********************************************************************************************************
+
+# Charger les variables d'environnement dans le script :
+
+- load_dotenv()
+- MYSQL_HOST = os.getenv('MYSQL_HOST')
+- MYSQL_PORT = os.getenv('MYSQL_PORT')
+- MYSQL_USER = os.getenv('MYSQL_USER')
+- MYSQL_PASSWORD = os.getenv(MYSQL_PASSWORD')
+- MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+
+********************************************************************************************************
+
+# Dans Powershell, pour voir ou changer les infos de connexion ou si la commande : "mysql -u root -p" 
+ne fonctionne pas :
+
+* DANS LES PARAMETRES :
+- Ajouter la variable environnement système au path pour MYSQL :
+variables d'environnement -> modifier les variables d'environnement -> variables système
+-> PATH -> Modifier -> Nouveau -> C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+* DANS POWERSHELL :
+- Entrer mysql -u root -p 
+- Entrer mdp 
+- mysql> SELECT user, host, plugin FROM mysql.user WHERE user = 'Audreyk';
+- mysql> SHOW GRANTS FOR 'Audreyk'@'localhost';
+- mysql> ALTER USER 'Audreyk'@'localhost' IDENTIFIED WITH mysql_native_password BY 'mon mot de passe';
+
+# NB : pour revenir à l'identification "caching_sha2_password", dans Powershell, revenir
+  à mysql -u root -p, mdp, puis ALTER USER 'Audreyk'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'votre_mot_de_passe';
+- Remplacez 'votre_mot_de_passe' par le nouveau mot de passe que vous souhaitez utiliser.
+- Pour vérifier les changements : SHOW CREATE USER 'Audreyk'@'localhost';
+- S'assurer que la colonne "plugin" indique "caching_sha2_password".
+
+# Points à considérer avec caching_sha2_password :
+
+- Compatibilité des clients : Avant de changer la méthode d'authentification, assurez-vous que vos clients MySQL 
+(comme les scripts Python utilisant PyMySQL) supportent la méthode d'authentification 
+que vous prévoyez d'utiliser.
+
+- Sécurité et bonnes pratiques : Utilisez des mots de passe forts et sécurisés pour vos 
+utilisateurs MySQL. Évitez de régresser vers des méthodes d'authentification moins 
+sécurisées sauf si nécessaire pour des raisons de compatibilité.
+
+********************************************************************************************************
+
+# Créer le fichier requirements.txt :
+
+- pip freeze > requirements.txt
+
+# Créer le fichier .gitignore :
+
+- venv/
+- .env
+
+********************************************************************************************************
+
+# Exécution du script :
+
+PS C:\Users\Utilisateur\Documents\Formation_Data\Projets\Projet_1_toys_and_models\Datasets_csv\vs_code> python toys_and_model_python_mysql.py
+MySQL environment variables are correctly defined
+Tables in the database: ['customers', 'employees', 'offices', 'orderdetails', 'orders', 'payments', 'productlines', 'products']
+
+Exemple pour la table "customers" :
+
+   customerNumber                customerName contactLastName contactFirstName  ... postalCode    country salesRepEmployeeNumber creditLimit
+0             103           Atelier graphique         Schmitt          Carine   ...      44000     France                 1370.0     21000.0
+1             112          Signal Gift Stores            King             Jean  ...      83030        USA                 1166.0     71800.0
+2             114  Australian Collectors, Co.        Ferguson            Peter  ...       3004  Australia                 1611.0    117300.0
+3             119           La Rochelle Gifts         Labrune          Janine   ...      44000     France                 1370.0    118200.0
+4             121          Baane Mini Imports      Bergulfsen           Jonas   ...       4110     Norway                 1504.0     81700.0
+
+********************************************************************************************************
+
+

@@ -1,0 +1,11 @@
+# Ignore venv (virtual environment)
+venv/
+
+# Ignore .env (Fichier ENV)
+# Correspondant aux paramètres de connexion à MySQL, soit :
+# MYSQL_HOST=127.0.0.1
+# MYSQL_PORT=3306
+# MYSQL_USER=Audreyk
+# MYSQL_PASSWORD=*** (à remplacer)
+# MYSQL_DATABASE=toys_and_models
+.env

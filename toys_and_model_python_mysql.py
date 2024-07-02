@@ -30,5 +30,88 @@ tables = inspector.get_table_names()
 print("Tables in the database:", tables)
 
 # Exemple de lecture d'une table dans un DataFrame pandas
-df = pd.read_sql_table('customers', engine)
-print(df.head())
+df_customers = pd.read_sql_table('customers', engine)
+print(df_customers.head())
+
+#********************************************************************************
+# CREER LES DATAFRAMES POUR CHAQUE TABLE DANS UN DICO ET LES RETOURNER
+# EN DEUX ETAPES (1ERE OPTION) :
+
+# Fonction pour créer des DataFrames et les stocker dans un dictionnaire
+def create_df_dict(tables):
+    dataframes = {}
+    for table in tables:
+        df = pd.read_sql_table(table, engine) # crée un df pour chq table
+        dataframes["df_" + table] = df # ajout du df au dico avec clé "df_table"
+        print(f"DataFrame df_{table} created") # impression du df créé
+    return dataframes
+
+# Appeler la fonction pour créer les DataFrames
+dataframes = create_df_dict(tables) # dico dataframes contenant ts les df
+
+# Exemple d'utilisation du dico pour créer l'un des DataFrames
+try:
+    df_employees = dataframes['df_employees']
+    print(df_employees.head())
+except KeyError:
+    print("DataFrame is not defined")
+
+df_customers = dataframes['df_customers']
+df_offices = dataframes['df_offices']
+df_orderdetails = dataframes['df_orderdetails']
+df_orders = dataframes['df_orders']
+df_payments = dataframes['df_payments']
+df_productlines = dataframes['df_productlines']
+df_products = dataframes['df_products']
+
+# Avantage de cette approche :
+# - Organisation : tous les df sont stockés dans un seul dico, ce qui facilite
+# la gestion.
+# - Evolutivité : il est facile d'ajouter de nouvelles tables sans changer la
+# structure du code.
+# - Lisibilité : le code est clair et chaque étape est explicitée, ce qui aide
+# à la compréhension et à la maintenance.
+
+#********************************************************************************
+# CREER LES DATAFRAMES POUR CHAQUE TABLE DANS UN DICO ET LES RETOURNER EN 
+# UNE SEULE ETAPE (2EME OPTION) :
+
+# Fonction create_df_dict englobant l'utilitation directe du dico pour créer 
+# chaque df après sa création
+
+def create_df_dict_direct(tables):
+    dataframes = {}
+    for table in tables:
+        df = pd.read_sql_table(table, engine)
+        dataframes["df_" + table] = df
+        print(f"DataFrame df_{table} created")
+        
+        # Exemple d'utilisation directe de chaque DataFrame après sa création
+        try:
+            globals()["df_" + table] = df  # Créer une variable globale pour chaque DataFrame
+            print(f"Variable df_{table} created and available globally.")
+            print(df.head())  # Afficher les premières lignes du DataFrame
+        except KeyError:
+            print(f"DataFrame df_{table} is not defined")
+    return dataframes
+
+# Appeler la fonction pour créer les DataFrames et les rendre disponibles globalement
+dataframes = create_df_dict_direct(tables)
+
+# NB : "globals()" est une fonction qui renvoie un dictionnaire représentant l'espace de
+# noms global. En ajoutant une nouvelle entrée à ce dictionnaire, vous créez une variable
+# globale.
+
+# Inconvénients de l'approche avec variables globales :
+# - Pollution de l'espace de noms global : en ajoutant de nombreuses variables globales, vous
+# risquez de rendre votre espace de noms global encombré, ce qui peut rendre le débogage et 
+# la maintenance plus difficiles.
+# - Risques de conflits de noms : si vous avez déjà des variables globales avec des noms 
+# similaires, cela peut entrainer des conflits et des comportements inattendus.
+# - Difficulté à suivre les variables : il peut être difficile de suivre quelles variables
+# ont été créées et où elles sont utilisées, surtout dans les projets de grande taille.
+# - Moins de modularité : les variables globales réduisent la modularité de votre code,
+# rendant plus difficile le test unitaire des fonctions et la réutilisation du code dans 
+# d'autres contextes.
+
+

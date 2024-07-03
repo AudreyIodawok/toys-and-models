@@ -13,6 +13,27 @@ df_customers
 
 df_customers.info()
 
+##<class 'pandas.core.frame.DataFrame'>
+##RangeIndex: 122 entries, 0 to 121
+##Data columns (total 13 columns):
+## #   Column                  Non-Null Count  Dtype  
+##---  ------                  --------------  -----  
+## 0   customerNumber          122 non-null    int64  
+## 1   customerName            122 non-null    object 
+## 2   contactLastName         122 non-null    object 
+## 3   contactFirstName        122 non-null    object 
+## 4   phone                   122 non-null    object 
+## 5   addressLine1            122 non-null    object 
+## 6   addressLine2            22 non-null     object 
+## 7   city                    122 non-null    object 
+## 8   state                   122 non-null    object 
+## 9   postalCode              122 non-null    object 
+## 10  country                 122 non-null    object 
+## 11  salesRepEmployeeNumber  100 non-null    float64
+## 12  creditLimit             122 non-null    float64
+##dtypes: float64(2), int64(1), object(10)
+##memory usage: 12.5+ KB
+
 print(len(df_customers))
 ## 122
 
@@ -204,7 +225,7 @@ print(rows_with_nan_postalCode[['customerNumber', 'city', 'postalCode']])
 city_postalCode_mapping = df_customers.dropna().drop_duplicates(subset='city')\
     .set_index('city')['postalCode'].to_dict()
 
-# Trier le dictionnaire par clés et imprimer les paires clé-valeur
+# Trier le dictionnaire par clés et imprimer les paires clé-valeur*
 sorted_city_postalCode_mapping = {key: city_postalCode_mapping[key] for key in\
                                   sorted(city_postalCode_mapping)}
 
@@ -246,7 +267,7 @@ complete_postalCode_dict = {'Central Hong Kong': '999077', 'Auckland': '0600', '
                             'Wellington': '6011', 'Milan': '20019'}
 
 # Remplacer les states NaN avec les valeurs du dictionnaire :
-df_customers['postaCode'] = df_customers.apply(
+df_customers['postalCode'] = df_customers.apply(
     lambda row: complete_postalCode_dict.get(row['city']) if pd.isna(row['postalCode']) \
         else row['postalCode'], axis=1
 )
@@ -257,5 +278,28 @@ for column in df_customers.columns:
     if num_nans > 0:
         print(f"Column '{column}' contains {num_nans} NaN values")
 ## Column 'addressLine2' contains 100 NaN values
-## Column 'postalCode' contains 7 NaN values
 ## Column 'salesRepEmployeeNumber' contains 22 NaN values
+
+## Les valeurs manquantes de postalCode ont bien été complétées.
+
+df_customers
+
+#**************************************************************************************************
+# *Trier le dictionnaire par clés et imprimer les paires clé-valeur :
+
+# sorted_city_postalCode_mapping = {key: city_postalCode_mapping[key] for key in\
+#                                  sorted(city_postalCode_mapping)}
+
+# - La fonction sorted() trie les clés du dictionnaire city_postalCode_mapping 
+# dans l'ordre alphabétique par défaut.
+# - L'expression entière utilise une compréhension de dictionnaire pour créer
+# un nouveau dictionnaire. Elle parcourt les clés triées
+# (sorted(city_postalCode_mapping)) et pour chaque clé, elle récupère la
+# la valeur correspondante dans 'city_postalCode_mapping'.
+
+# **key représente chaque clé triée.
+# **city_postalCode_mapping[key] est la valeur associée à cette clé dans le 
+# dictionnaire original.
+
+# -> Donc, pour chaque clé triée, elle crée une nouvelle entrée dans le 
+# dictionnaire sorted_city_postalCode_mapping.

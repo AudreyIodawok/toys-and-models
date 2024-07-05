@@ -99,12 +99,24 @@ opérations.
 
 # Charger les variables d'environnement dans le script :
 
+- Obtenir le chemin du répertoire du script actuel
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+- Construire le chemin complet du fichier .env
+env_path = os.path.join(script_dir, '.env')
 - load_dotenv()
+
+- Charger les variables d'environnement à partir du fichier .env
+load_dotenv(dotenv_path=env_path)
 - MYSQL_HOST = os.getenv('MYSQL_HOST')
 - MYSQL_PORT = os.getenv('MYSQL_PORT')
 - MYSQL_USER = os.getenv('MYSQL_USER')
 - MYSQL_PASSWORD = os.getenv(MYSQL_PASSWORD')
 - MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+
+Même si les fichiers '.env' et 'toys_and_model_python_mysql.py' se trouvent ici
+dans le même sous-dossier 'connexion_mysql_travaux_sur_df', on spécifie 
+spécifiquement le chemin absolu pour le fichier '.env'.
 
 ********************************************************************************************************
 

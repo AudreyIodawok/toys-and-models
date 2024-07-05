@@ -1,13 +1,32 @@
-from toys_and_model_python_mysql import df_customers, df_employees, df_orderdetails, df_payments,\
-df_offices, df_orders, df_productlines, df_products
-
 import numpy as np
 import pandas as pd
 import pprint
+import sys
+import os
+
+# Ajouter le répertoire parent au chemin de recherche du module 'engine'
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+sys.path.append(parent_dir)
+#print(parent_dir)
+# Importer le module
+from toys_and_model_python_mysql import engine
 
 #**************************************************************************************************
-# **DF_CUSTOMERS**
+# **DF_CUSTOMERS INFORMATION**
 #**************************************************************************************************
+tables = ['customers']
+
+def create_df_dict(tables):
+    dataframes = {}
+    for table in tables:
+        df = pd.read_sql_table(table, engine) # crée un df pour chq table
+        dataframes["df_" + table] = df # ajout du df au dico avec clé "df_table"
+        print(f"DataFrame df_{table} created") # impression du df créé
+    return dataframes
+
+dataframes = create_df_dict(tables)
+
+df_customers = dataframes['df_customers']
 
 df_customers
 
@@ -26,21 +45,22 @@ df_customers.info()
 ## 5   addressLine1            122 non-null    object 
 ## 6   addressLine2            22 non-null     object 
 ## 7   city                    122 non-null    object 
-## 8   state                   122 non-null    object 
-## 9   postalCode              122 non-null    object 
+## 8   state                   49 non-null     object 
+## 9   postalCode              115 non-null    object 
 ## 10  country                 122 non-null    object 
 ## 11  salesRepEmployeeNumber  100 non-null    float64
 ## 12  creditLimit             122 non-null    float64
 ##dtypes: float64(2), int64(1), object(10)
 ##memory usage: 12.5+ KB
 
+
 print(len(df_customers))
 ## 122
 
 # Nombre de valeurs à 0 :
 for column in df_customers.columns:
-    if (df_customers[column] == 0).any():
-        print(f"Column '{column}' contains zeros")
+   if (df_customers[column] == 0).any():
+       print(f"Column '{column}' contains zeros")
 ## Column 'creditLimit' contains zeros
 
 # Nombre de valeurs NaN :
@@ -56,13 +76,24 @@ for column in df_customers.columns:
 ## Il y a 73 valeurs manquantes pour les pays du client, 7 valeurs manquantes
 ## pour les codes postaux et 22 clients qui n'ont pas de commercial attribué.
 
+#**************************************************************************************************
+# **DF_CUSTOMERS NETTOYAGE ET COMPLETION**
+#**************************************************************************************************
+
+#___________________________________________________________________________________________________
+# NETTOYAGE :
+#___________________________________________________________________________________________________
+
 # Retirer les espaces en trop à la fin des noms de city ou state si existants :
 df_customers['city'] = df_customers['city'].str.strip()
 df_customers['state'] = df_customers['state'].str.strip()
+
 # Corriger orthographe de city == 'Münich' :
 df_customers['city'] = df_customers['city'].str.replace('Munich', 'Münich')
 
+#___________________________________________________________________________________________________
 # COMPLETER LES VALEURS MANQUANTES DE STATE :
+#___________________________________________________________________________________________________
 
 # Pour les pays manquants :
 rows_with_nan_state = df_customers[df_customers['state'].isna()]
@@ -71,6 +102,7 @@ rows_with_nan_state = df_customers[df_customers['state'].isna()]
 print("Rows with NaN in 'state' column:")
 print(rows_with_nan_state[['customerNumber', 'city', 'state']])
 
+#___________________________________________________________________________________________________
 # SOLUTION 1 : CREER UN DICTIONNAIRE A PARTIR DU DF POUR REMPLACER LES VALEURS NAN
 
 # Créer un dictionnaire de correspondance ville-état à partir des données complètes
@@ -87,12 +119,13 @@ df_customers['state'] = df_customers.apply(
 )
 
 # Afficher le DataFrame après remplacement des valeurs NaN
-# print("DataFrame after filling NaN values in 'state' column:")
-# print(df_customers)
+print("DataFrame after filling NaN values in 'state' column:")
+print(df_customers)
 
-# Cette option ne fonctionnera pas car les valeurs de states manquantes ne 
-# se trouvent pas dans le dictionnaire issu du df.
+## -> Cette option ne fonctionnera pas car les valeurs de states manquantes ne 
+## se trouvent pas dans le dictionnaire issu du df.
 
+#___________________________________________________________________________________________________
 # SOLUTION 2 : CREER UN DICTIONNAIRE MANUEL REMPLACER LES VALEURS NAN
 
 # Identifier les villes avec des valeurs NaN dans la colonne 'state'
@@ -175,20 +208,20 @@ complete_state_dict = {'Nantes': 'France', 'Stavern': 'Norway', 'Warszawa': 'Pol
                        'Frankfurt': 'Germany', 'Madrid': 'Spain', 'Luleå': 'Sweden',\
                        'Kobenhavn': 'Denmark', 'Lyon': 'France', 'Singapore': 'Singapore',\
                        'Bergen': 'Norway', 'Lisboa': 'Portugal', 'Lille': 'France', 'Paris': 'France',\
-                        'Helsinki': 'Finland', 'Manchester': 'England', 'Dublin': 'Ireland',\
-                        'Liverpool': 'England', 'Strasbourg': 'France', 'Central Hong Kong': 'Hong Kong',\
-                        'Barcelona': 'Spain', 'Cunewalde': 'Germany', 'Århus': 'Denmark', \
-                        'Toulouse': 'France', 'Torino': 'Italy', 'Versailles': 'France', \
-                        'Köln': 'Germany', 'München': 'Germany', 'Bergamo': 'Italy', 'Fribourg': 'Switzerland',\
-                        'Genève': 'Switzerland', 'Oslo': 'Norway', 'Amsterdam': 'Netherlands', 'Berlin': 'Germany',\
-                        'Oulu': 'Finland', 'Bruxelles': 'Belgium', 'Auckland': 'New Zealand', 'London': 'England',\
-                        'Espoo': 'Finland', 'Brandenburg': 'Germany', 'Marseille': 'France',\
-                        'Reims': 'France', 'Münster': 'Germany', 'Bern': 'Switzerland', 'Charleroi': 'Belgium',\
-                        'Salzburg': 'Austria', 'Makati City': 'Philippines', 'Reggio Emilia': 'Italy',\
-                        'Stuttgart': 'Germany', 'Wellington': 'New Zealand', 'Münich': 'Germany',\
-                        'Leipzig': 'Germany', 'Bräcke': 'Sweden', 'Graz': 'Austria', 'Aachen': 'Germany',\
-                        'Milan': 'Italy', 'Mannheim': 'Germany', 'Saint Petersburg': 'Russia',\
-                        'Herzlia': 'Israel', 'Sevilla': 'Spain'}
+                       'Helsinki': 'Finland', 'Manchester': 'England', 'Dublin': 'Ireland',\
+                       'Liverpool': 'England', 'Strasbourg': 'France', 'Central Hong Kong': 'Hong Kong',\
+                       'Barcelona': 'Spain', 'Cunewalde': 'Germany', 'Århus': 'Denmark', \
+                       'Toulouse': 'France', 'Torino': 'Italy', 'Versailles': 'France', \
+                       'Köln': 'Germany', 'München': 'Germany', 'Bergamo': 'Italy', 'Fribourg': 'Switzerland',\
+                       'Genève': 'Switzerland', 'Oslo': 'Norway', 'Amsterdam': 'Netherlands', 'Berlin': 'Germany',\
+                       'Oulu': 'Finland', 'Bruxelles': 'Belgium', 'Auckland': 'New Zealand', 'London': 'England',\
+                       'Espoo': 'Finland', 'Brandenburg': 'Germany', 'Marseille': 'France',\
+                       'Reims': 'France', 'Münster': 'Germany', 'Bern': 'Switzerland', 'Charleroi': 'Belgium',\
+                       'Salzburg': 'Austria', 'Makati City': 'Philippines', 'Reggio Emilia': 'Italy',\
+                       'Stuttgart': 'Germany', 'Wellington': 'New Zealand', 'Münich': 'Germany',\
+                       'Leipzig': 'Germany', 'Bräcke': 'Sweden', 'Graz': 'Austria', 'Aachen': 'Germany',\
+                       'Milan': 'Italy', 'Mannheim': 'Germany', 'Saint Petersburg': 'Russia',\
+                       'Herzlia': 'Israel', 'Sevilla': 'Spain'}
 
 # Remplacer les states NaN avec les valeurs du dictionnaire :
 df_customers['state'] = df_customers.apply(
@@ -207,7 +240,9 @@ for column in df_customers.columns:
 
 ## Les valeurs manquantes de state ont bien été complétées.
 
+#___________________________________________________________________________________________________
 # COMPLETER LES VALEURS MANQUANTES DE POSTALCODE :
+#___________________________________________________________________________________________________
 
 # Retirer les espaces en trop à la fin des postalCode (au cas où) :
 df_customers['postalCode'] = df_customers['postalCode'].str.strip()
@@ -219,6 +254,7 @@ rows_with_nan_postalCode = df_customers[df_customers['postalCode'].isna()]
 print("Rows with NaN in 'postalCode' column:")
 print(rows_with_nan_postalCode[['customerNumber', 'city', 'postalCode']])
 
+#___________________________________________________________________________________________________
 # SOLUTION 1 : CREER UN DICTIONNAIRE A PARTIR DU DF POUR REMPLACER LES VALEURS NAN
 
 # Créer un dictionnaire de correspondance ville-code postal à partir des données complètes
@@ -238,6 +274,7 @@ df_customers['state'] = df_customers.apply(
         else row['state'], axis=1
 )
 
+#___________________________________________________________________________________________________
 # SOLUTION 2 : CREER UN DICTIONNAIRE MANUEL REMPLACER LES VALEURS NAN
 
 # Identifier les villes avec des valeurs NaN dans la colonne 'postalCode'
@@ -258,7 +295,7 @@ print(len(nan_city_postalCode_mapping))
 ## 'Cork': nan,
 ## 'Milan': nan,
 ## 'Wellington': nan}
-5
+##5
 
 print(nan_city_postalCode_mapping)
 
@@ -282,13 +319,13 @@ for column in df_customers.columns:
 
 ## Les valeurs manquantes de postalCode ont bien été complétées.
 
-df_customers
-
 #**************************************************************************************************
-# *Trier le dictionnaire par clés et imprimer les paires clé-valeur :
+# *NOTA BENE
+#**************************************************************************************************
+# Trier le dictionnaire par clés et imprimer les paires clé-valeur :
 
-# sorted_city_postalCode_mapping = {key: city_postalCode_mapping[key] for key in\
-#                                  sorted(city_postalCode_mapping)}
+sorted_city_postalCode_mapping = {key: city_postalCode_mapping[key] for key in\
+                                  sorted(city_postalCode_mapping)}
 
 # - La fonction sorted() trie les clés du dictionnaire city_postalCode_mapping 
 # dans l'ordre alphabétique par défaut.
@@ -303,3 +340,6 @@ df_customers
 
 # -> Donc, pour chaque clé triée, elle crée une nouvelle entrée dans le 
 # dictionnaire sorted_city_postalCode_mapping.
+
+#**************************************************************************************************
+

@@ -1,12 +1,33 @@
-from toys_and_model_python_mysql import df_orders
-
 import numpy as np
 import pandas as pd
 import pprint
+import sys
+import os
+
+# Ajouter le répertoire parent au chemin de recherche du module 'engine'
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+sys.path.append(parent_dir)
+#print(parent_dir)
+# Importer le module
+from toys_and_model_python_mysql import engine
 
 #**************************************************************************************************
-# **DF_ORDERS**
+# **DF_ORDERS INFORMATION**
 #**************************************************************************************************
+
+tables = ['orders']
+
+def create_df_dict(tables):
+    dataframes = {}
+    for table in tables:
+        df = pd.read_sql_table(table, engine) # crée un df pour chq table
+        dataframes["df_" + table] = df # ajout du df au dico avec clé "df_table"
+        print(f"DataFrame df_{table} created") # impression du df créé
+    return dataframes
+
+dataframes = create_df_dict(tables)
+
+df_orders = dataframes['df_orders']
 
 df_orders
 
@@ -93,7 +114,7 @@ order_status_wo_shipdate
 
 ## Les commandes sans shippedDate sont soit annulées soit en attente.
 
-# Voir si des n° de commandes sont duppliqués :
+# Voir si des n° de commandes sont dupliqués :
 duplicates = df_orders[df_orders.duplicated(subset='orderNumber', keep=False)]
 print(duplicates)
 
@@ -106,3 +127,17 @@ print(duplicates)
 
 # Afficher uniquement les commandes dupliquées
 #print(duplicate_counts[duplicate_counts > 1])
+
+# Période concernée par les paiements :
+
+# Calcul des dates de commandes min et max
+min_date_order = df_orders['orderDate'].min()
+min_date_order_str = min_date_order.strftime('%d/%m/%Y')
+max_date_order = df_orders['orderDate'].max()
+max_date_order_str = max_date_order.strftime('%d/%m/%Y')
+
+# Calcul de la période
+duration_order = (max_date_order - min_date_order).days
+
+print(f"Les commandes s'échelonnent du {min_date_order_str} au {max_date_order_str}, couvrant une période de {duration_order} jours.")
+## Les commandes s'échelonnent du 23/07/2021 au 10/10/2023, couvrant une période de 809 jours.

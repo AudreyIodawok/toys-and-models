@@ -1,15 +1,39 @@
-from toys_and_model_python_mysql import df_offices
-from df_customers_clean import complete_state_dict
-
 import numpy as np
 import pandas as pd
 import pprint
+import sys
+import os
+
+# Ajouter le répertoire parent au chemin de recherche du module 'engine'
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+sys.path.append(parent_dir)
+#print(parent_dir)
+# Importer le module
+from toys_and_model_python_mysql import engine
+from fonctions import complete_state_dict
 
 #**************************************************************************************************
-# **DF_OFFICES**
+# **DF_OFFICES INFORMATION**
 #**************************************************************************************************
+
+tables = ['offices']
+
+def create_df_dict(tables):
+    dataframes = {}
+    for table in tables:
+        df = pd.read_sql_table(table, engine) # crée un df pour chq table
+        dataframes["df_" + table] = df # ajout du df au dico avec clé "df_table"
+        print(f"DataFrame df_{table} created") # impression du df créé
+    return dataframes
+
+dataframes = create_df_dict(tables)
+
+df_offices = dataframes['df_offices']
 
 df_offices
+
+df_offices.info()
+
 
 ##  officeCode           city             phone              addressLine1 addressLine2       state    country postalCode territory
 ##0          1  San Francisco   +1 650 219 4782         100 Market Street    Suite 300          CA        USA      94080        NA
@@ -20,7 +44,6 @@ df_offices
 ##5          6         Sydney   +61 2 9264 2451     5-11 Wentworth Avenue     Floor #2        None  Australia   NSW 2010      APAC
 ##6          7         London  +44 20 7877 2041       25 Old Broad Street      Level 7        None         UK   EC2N 1HN      EMEA
 
-df_offices.info()
 
 ##<class 'pandas.core.frame.DataFrame'>
 ##RangeIndex: 7 entries, 0 to 6
@@ -56,6 +79,9 @@ for column in df_offices.columns:
 ## Column 'addressLine2' contains 2 NaN values
 ## Column 'state' contains 3 NaN values
 
+#**************************************************************************************************
+# **DF_OFFICES COMPLETION**
+#**************************************************************************************************
 
 # Identifier les offices avec des valeurs NaN dans la colonne 'state'
 offices_with_nan_state = df_offices[df_offices['state'].isna()]['city'].unique()
@@ -75,7 +101,7 @@ print(len(nan_offices_state_mapping))
 # On réutilise le dictionnaire "villes : état" créé pour les clients et on l'update avec
 # le dico créé "complete_offices_state_mapping"
 complete_offices_state_mapping = {'London': 'England', 'Paris': 'France', 'Sydney': 'Australia'}
-complete_state_dict.update(complete_offices_state_mapping)
+complete_state_dict.update(complete_offices_state_mapping) # Màj du dico créé dans df_customers_clean
 pprint.pprint(complete_state_dict)
 
 # Remplacer les states NaN avec les valeurs du dictionnaire :
@@ -85,9 +111,12 @@ df_offices['state'] = df_offices.apply(
 )
 
 # Nombre de valeurs NaN :
+
 for column in df_offices.columns:
     num_nans = df_offices[column].isna().sum()
     if num_nans > 0:
         print(f"Column '{column}' contains {num_nans} NaN values")
 ## Column 'addressLine2' contains 2 NaN values
 ## La colonne state a bien été complétée.
+
+

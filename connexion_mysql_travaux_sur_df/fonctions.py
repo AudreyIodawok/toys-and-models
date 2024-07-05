@@ -22,7 +22,7 @@ def create_dataframe(dataframes, key):
         print(f"Dataframe{key} n'existe pas dans le dictionnaire 'dataframes'.")
 
 #___________________________________________________________________________________________________
-# state_dict.py (voir df_customers_clean.py) :
+# state_dict.py (voir exploration_df_customers.py) :
 
 complete_state_dict = {
     'Nantes': 'France', 'Stavern': 'Norway', 'Warszawa': 'Poland',
@@ -46,7 +46,7 @@ complete_state_dict = {
 }
 
 #___________________________________________________________________________________________________
-# Mise à jour du dictionnaire 'state' (voir df_offices_clean.py) :
+# Mise à jour du dictionnaire 'state' (voir exploration_df_offices.py) :
 
 def update_state_dict(new_entries):
     global complete_state_dict
@@ -56,14 +56,14 @@ def update_state_dict(new_entries):
     return complete_state_dict
 
 #___________________________________________________________________________________________________
-# postalcode_dict.py (voir df_customers_clean.py) :
+# postalcode_dict.py (voir exploration_df_customers.py) :
 
 complete_postalCode_dict = {'Central Hong Kong': '999077', 'Auckland': '0600', 'Cork': 'P31',\
                             'Wellington': '6011', 'Milan': '20019'}
 
 
 #___________________________________________________________________________________________________
-# Nettoyer et compléter le df (voir df_customers_clean.py) :
+# Nettoyer et compléter le df (voir exploration_df_customers.py) :
 
 def clean_and_complete_df(df):
     if df is not None:
@@ -91,7 +91,7 @@ def clean_and_complete_df(df):
         return None
 
 #___________________________________________________________________________________________________    
-# Compléter le df (voir df_offices_clean.py) :
+# Compléter le df (voir exploration_df_offices.py) :
 
 def complete_df(df):
     if df is not None:

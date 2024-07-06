@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 
 # Définir le répertoire contenant les fichiers
 directory = 'C:\\Users\\Utilisateur\\Documents\\Formation_Data\\Projets\\Projet_1_toys_and_models\\Datasets_csv\\vs_code\\df_cleaned_csv'

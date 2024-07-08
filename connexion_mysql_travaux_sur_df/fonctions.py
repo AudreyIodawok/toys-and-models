@@ -1,7 +1,46 @@
+import pandas as pd
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
+import os
+
+#___________________________________________________________________________________________________
+# Créer l'engine depuis l'environnement '.env' :
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
+
+# Récupérer les variables d'environnement
+mysql_host = os.getenv('MYSQL_HOST')
+mysql_port = os.getenv('MYSQL_PORT')
+mysql_user = os.getenv('MYSQL_USER')
+mysql_password = os.getenv('MYSQL_PASSWORD')
+mysql_database = os.getenv('MYSQL_DATABASE')
+
+db_host = os.getenv('DB_HOST')
+db_user = os.getenv('DB_USER')
+db_password = os.getenv('DB_PASSWORD')
+new_db_name = os.getenv('NEW_DB_NAME')
+
+def create_engine_from_env(db_name):
+    """
+    Crée un moteur SQLAlchemy à partir des variables d'environnement.
+
+    :param db_name: Le nom de la base de données à laquelle se connecter
+    :param db_user: le nom d'utilisateur de la base de données
+    :param db_password: le mot de passe de la base de données
+    :param db_name: le nom de la base de données à laquelle se connecter
+    :return: Le moteur SQLAlchemy
+    """
+    return create_engine(f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}/{db_name}')
+
+# Créer le moteur pour la base de données originale
+original_engine = create_engine_from_env(mysql_database)
+
+# Créer le moteur pour la nouvelle base de données
+new_engine = create_engine_from_env(new_db_name)
+
 #___________________________________________________________________________________________________
 # Créer le dico des dataframes (voir toys_and_model_python_mysql.py) :
-
-import pandas as pd
 
 def create_df_dict(tables, engine):
     dataframes = {}
@@ -111,8 +150,6 @@ def complete_df(df):
 #___________________________________________________________________________________________________        
 # Enregistrer cleaned_employees_df au format .csv :
 
-import os
-
 def save_csv_file(df, save_path, file_name = 'df.csv'):
 
     """
@@ -134,3 +171,17 @@ def save_csv_file(df, save_path, file_name = 'df.csv'):
     df.to_csv(csv_file_path, index=False)
 
     print(f"Le fichier '{file_name}' a été enregistré à l'emplacement : {csv_file_path}")
+
+#___________________________________________________________________________________________________        
+# Exporter les df vers la nouvelle base de données :
+
+# Connexion à la nouvelle base de données via SQLAlchemy
+# new_engine = create_engine(f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}/new_toys_and_models')
+
+# Fonction pour exporter les DataFrames vers MySQL
+def export_df_to_mysql(dataframes, engine):
+    for name, df in dataframes.items():
+        table_name = name.replace('df_', '').replace('_cleaned','')  # Enlever 'df_' et '_cleaned' pour obtenir le nom de la table
+        df.to_sql(table_name, con=engine, if_exists='replace', index=False)
+        print(f"DataFrame {name} exported to table {table_name} in MySQL")
+

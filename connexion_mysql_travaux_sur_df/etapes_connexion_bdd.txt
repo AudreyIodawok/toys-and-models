@@ -181,4 +181,16 @@ Exemple pour la table "customers" :
 
 ********************************************************************************************************
 
+# Exporter les df sous forme de tables dans une nouvelle base de données MySQL :
 
+- installer les librairies nécessaires : pip install mysql-connector-python
+(déjà installées : pandas, sqlalchemy, python-dotenv)
+
+- configurer les variables d'environnement : mettre à jour le fichier .env avec :
+DB_HOST=your_database_host
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+NEW_DB_NAME=new_toys_and_models
+
+- Dans le script principal 'main.py' : charger les variables d'environnement, créer
+la nouvelle base de données dans MySQL et charger les données dans la nouvelle bdd.
